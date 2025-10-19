@@ -7,20 +7,24 @@
 /// - everyone can increment a counter by 1
 /// - the owner of the counter can reset it to any value
 module counter::counter {
+  use sui::object;
+  use sui::transfer;
+  use sui::tx_context::TxContext;
+
   /// A shared counter.
   public struct Counter has key {
-    id: UID,
+    id: object::UID,
     owner: address,
     value: u64
   }
 
-  /// Create and share a Counter object.
+  /// Create and transfer a Counter object to the sender.
   public fun create(ctx: &mut TxContext) {
-    transfer::share_object(Counter {
+    transfer::transfer(Counter {
       id: object::new(ctx),
-      owner: ctx.sender(),
+      owner: tx_context::sender(ctx),
       value: 0
-    })
+    }, tx_context::sender(ctx))
   }
 
   /// Increment a counter by 1.
@@ -30,7 +34,7 @@ module counter::counter {
 
   /// Set value (only runnable by the Counter owner)
   public fun set_value(counter: &mut Counter, value: u64, ctx: &TxContext) {
-    assert!(counter.owner == ctx.sender(), 0);
+    assert!(counter.owner == tx_context::sender(ctx), 0);
     counter.value = value;
   }
 }

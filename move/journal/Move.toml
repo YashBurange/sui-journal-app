@@ -1,7 +1,9 @@
 [package]
-name = "counter"
+name = "journal"
 edition = "2024.alpha"
 
 
+
+
 [addresses]
-counter = "0x0"
+journal = "0x0"
